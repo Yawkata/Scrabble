@@ -31,6 +31,8 @@
 *.out
 *.app
 
+
+# Custom
 **.idea/
 **bin/
 **obj/
