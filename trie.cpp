@@ -172,7 +172,6 @@ int main() {
     //                                         "zza", "appy", "abdom", "abdomen",
     //                                         "abdominohysterectomy", "abdominohysterotomy" });
 
-    
     // for(string item : testStrings)
     //     cout << item << " -> " << ((trieInsert(Trie, item)) ? "True" : "False" )<< endl;
     
@@ -186,6 +185,7 @@ int main() {
 
     // cout << endl << "TRIE" << endl;
     // printTrie(Trie); */
+    
     struct trie* trieFromFile = getTrieFromDict("dict.txt");
     printTrie(trieFromFile);
 
