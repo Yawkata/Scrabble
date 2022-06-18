@@ -108,6 +108,21 @@ bool trieInsert(struct trie* trie, string word) {
     }
 }
 
+bool findWordInTrie(struct trie* trie, string word) {
+    if(!trie) return false;
+
+    struct trieNode* curNode = getChildByLetter(trie->base, word[0]);
+    if (!curNode) return false;
+
+    for(int i = 1; i < word.size(); i++) {
+        curNode = getChildByLetter(curNode->children, word[i]);
+        if (!curNode) return false;
+    }
+
+    if (!curNode->terminal) return false;
+    return true;
+}
+
 struct trie* getTrieFromDict(string fileName) {
     struct trie* newTrie = trieInit();
     ifstream dictionary(fileName);
@@ -173,4 +188,11 @@ int main() {
     // printTrie(Trie); */
     struct trie* trieFromFile = getTrieFromDict("dict.txt");
     printTrie(trieFromFile);
+
+    cout << endl;
+
+    cout << "pizza -> " << (findWordInTrie(trieFromFile, "pizza") ? "Found!" : "Not Found!") << endl;
+    cout << "abdominohysterotomy -> " << (findWordInTrie(trieFromFile, "abdominohysterotomy") ? "Found!" : "Not Found!") << endl;
+    cout << "zza -> " << (findWordInTrie(trieFromFile, "zza") ? "Found!" : "Not Found!") << endl;
+    cout << "z -> " << (findWordInTrie(trieFromFile, "z") ? "Found!" : "Not Found!") << endl;
 }
