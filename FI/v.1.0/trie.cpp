@@ -31,7 +31,6 @@ int calcPoints(struct letter* countLetters, char letter) {
     return countLetters[NUM_LETTERS].count - countLetters[letterIndex].count;
 }
 
-
 struct trieNode {
     char letter;
     bool terminal;
@@ -143,30 +142,106 @@ void printTrie(struct trieNode* root) {
     delete count;
 }
 
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+#define DICTIONARY_FILE "dictionary.txt"
+#define CACHE_FILE "cache.bin"
+#define LOAD_FILE "last_modified.txt"
 
-int main() {
-    struct letter* dict = initDict();
-    struct trieNode* root = getTrieFromDict("dict.txt", dict);
-    
-    vector<char> testLetters = { 'a', 't', 'c', '&' };
-    
-    for(char letter : testLetters) {
-        int points = calcPoints(dict, letter);
+void updateLoadFile(string fileName){
+    fstream loadFile;
+    loadFile.open(LOAD_FILE, ios::out);
 
-        if(points == -1)
-            cout << "Invalid character!" << endl;
-        else
-            cout << "Points of letter " << letter << ": " << points << " -> " << dict[letterToIndex(letter)].count << endl;
-        
-        cout << endl;
+    if(loadFile.is_open()){
+        loadFile << fileName << endl;
+        loadFile.close();
+    }else{
+        cout << "Error" << endl;
+    }
+}
+
+void updateCacheFile(struct trieNode* root){
+    fstream binFile;
+    binFile.open(CACHE_FILE, ios::out);
+
+    if(binFile.is_open()){
+        binFile.write((char*)root, sizeof(struct trieNode));
+        binFile.close();
+    }else{
+        cout << "Error" << endl;
+    }
+}
+
+struct trieNode* getTrieFromCacheFile(){
+    struct trieNode* root = initNode('#', false);
+
+    fstream binFile;
+    binFile.open(CACHE_FILE, ios::in | ios::binary);
+
+    if(binFile.is_open()){
+        binFile.read((char*)root, sizeof(struct trieNode));
+        binFile.close();
     }
 
-    cout << endl;
-    for (int i = 0; i < NUM_LETTERS; i++) cout << "Letter: " << (char)(i+'a') << "\t\t" << dict[i].count << endl;
+    return root;
+}
 
-    cout << "Words: "<< dict[NUM_LETTERS].count << endl;
+int chooseFile(string dictFileName, string cacheFileName, string loadFileName){
+    string fileToLoad;
 
-    // cout << endl;
+    fstream loadFile;
+    loadFile.open(LOAD_FILE, ios::in);
+    if(loadFile.is_open()){
+        getline(loadFile, fileToLoad);
+        loadFile.close();
+    }else{
+        loadFile.open(LOAD_FILE, ios::out);
+        printf("\nTree will be loaded from the .txt file!\n");
+        updateLoadFile(cacheFileName);
+        loadFile.close();
+        return 0;
+    }
 
-    // printTrie(root);
+
+    if(fileToLoad == cacheFileName){
+        printf("\nTree will be loaded from the .bin file!\n");
+        return 1;
+    }
+
+    printf("\nTree will be loaded from the .txt file!\n");
+    updateLoadFile(cacheFileName);
+    return 0;
+}
+
+void addWordToDictionary(string word){
+    fstream dictFile;
+    dictFile.open(DICTIONARY_FILE, ios::app);
+
+    if(dictFile.is_open()){
+        dictFile << word << endl;
+        dictFile.close();
+    }else{
+        cout << "Error" << endl;
+    }
+
+    updateLoadFile(DICTIONARY_FILE);
+}
+
+void loadTrie(){
+    struct trieNode* trie = initNode('#', false);
+    struct letter* dict = initDict();
+
+    if(chooseFile(DICTIONARY_FILE, CACHE_FILE, LOAD_FILE)){
+        trie = getTrieFromCacheFile();
+    }else{
+        trie = getTrieFromDict(DICTIONARY_FILE, dict);
+        updateCacheFile(trie);
+    }
+}
+
+
+
+int main() {
+    addWordToDictionary("novaduma");
+    loadTrie();
 }
