@@ -9,7 +9,7 @@ using namespace std;
 struct trieNode {
     char symbol;
     bool terminal;
-    struct trieNode* children[NUM_VALID_SYMBOLS];  // [abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -]
+    struct trieNode* children[NUM_VALID_SYMBOLS];  // [abcdefghijklmnopqrstuvwxyz -]
 };
 
 struct trieNode* initNode(char symbol, bool terminal) {
