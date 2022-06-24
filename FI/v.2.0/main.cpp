@@ -16,26 +16,27 @@ int* initDict() {
 };
 
 int letterToIndex(char letter) {
+    int index;
+
+    if(letter == ' ')
+        return 26;
+    else if(letter == '-')
+        return 27;
+    else
+        return 28;
+
     if(letter >= 'A' && letter <= 'Z')
         letter += 32;
 
-    return letter - 'a';
+    index = letter - 'a';
+
+    return index;
 }
 
 int calcPoints(int* countLetters, char letter) {
     int letterIndex = -1;
 
-    if(letter >= 'A' && letter <= 'Z')
-        letter += 32;
-
-    if(letter != ' ' && letter != '-' && letter != 39)
-        letterIndex = letterToIndex(letter);
-    else if(letter == ' ')
-        letterIndex = 26;
-    else if(letter == '-')
-        letterIndex = 27;
-    else
-        letterIndex = 28;
+    letterIndex = letterToIndex(letter);
 
     if (letterIndex < 0 || letterIndex > NUM_LETTERS-1) return -1;
 
@@ -68,18 +69,7 @@ bool trieInsert(struct trieNode* root, string word, int* dict) {
     for(int i = 0; i < NUM_LETTERS; i++) passedLetters[i] = false;
 
     for(int i = 0; i < word.size(); i++) {
-        if(word[i] >= 'A' && word[i] <= 'Z')
-            word[i] += 32;
-
-        int letterIndex = -1;
-        if(word[i] != ' ' && word[i] != '-' && word[i] != 39)
-            letterIndex = letterToIndex(word[i]);
-        else if(word[i] == ' ')
-            letterIndex = 26;
-        else if(word[i] == '-')
-            letterIndex = 27;
-        else
-            letterIndex = 28;
+        int letterIndex = letterToIndex(word[i]);
 
         if (letterIndex < 0 || letterIndex > NUM_LETTERS-1) return false;
 
@@ -91,6 +81,7 @@ bool trieInsert(struct trieNode* root, string word, int* dict) {
         if (cur->children[letterIndex] == NULL) {
             cur->children[letterIndex] = initNode(word[i], (i == word.size()-1));
             smthAdded = true;
+            /// dobavqne na cur->children[letterIndex] v fail
         }
 
         cur = cur->children[letterIndex];
@@ -263,9 +254,16 @@ void loadTrie(){
     }
 
     printTrie(trie);
+}
+
+int main() {
+    //addWordToDictionary("novaduma");
+    loadTrie();
 
     vector<char> testLetters = { 'F', 'i', 'l', 'i', 'p'};
     int sum = 0;
+
+    int* dict = initDict();
 
     for(char letter : testLetters) {
         int points = calcPoints(dict, letter);
@@ -289,12 +287,4 @@ void loadTrie(){
     cout << "Apostrophe: " << dict[NUM_LETTERS - 2] << endl;
 
     cout << "Words: "<< dict[NUM_LETTERS-1] << endl << endl;
-
-}
-
-int main() {
-    //addWordToDictionary("novaduma");
-    loadTrie();
-
-
 }
