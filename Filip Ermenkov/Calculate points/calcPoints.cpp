@@ -1,15 +1,12 @@
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
 struct trie{
     char letter;
     int wordEnding;
-    struct trie* next[26];
-};
-
-struct letters{
-    int count;
+    struct trie* next[30];
 };
 
 struct trie* initNode(char newLetter, int wordEnding){
@@ -19,56 +16,90 @@ struct trie* initNode(char newLetter, int wordEnding){
 
     newNode->wordEnding = wordEnding;
 
-    for(int i = 0; i < 26; i++)
+    for(int i = 0; i < 30; i++)
         newNode->next[i] = nullptr;
 
     return newNode;
 }
 
-struct letters* initDic(){
-    struct letters* newCountLetters = new struct letters[27];
+int* initDic(){
+    int* newCountLetters = new int[30];
 
-    for(int i = 0; i < 27; i++)
-        newCountLetters[i].count = 0;
+    for(int i = 0; i < 30; i++)
+        newCountLetters[i] = 0;
 
     return newCountLetters;
 };
 
-struct trie* addWord(struct trie* root, struct letters* countLetters, string newWord){
-    struct trie* current = root;
-    int passed[26];
+int getIndex(char letter) {
+    int index;
 
-    for(int i = 0; i < 26; i++)
+    if(letter == ' ')
+        return 26;
+    else if(letter == '-')
+        return 27;
+    else if(letter == 39)
+        return 28;
+
+    if(letter >= 'A' && letter <= 'Z')
+        letter += 32;
+
+    index = letter - 'a';
+
+    return index;
+}
+
+struct trie* addWord(struct trie* root, int* countLetters, string newWord){
+    struct trie* current = root;
+    int passed[29];
+
+    for(int i = 0; i < 29; i++)
         passed[i] = 0;
 
     for(int i = 0; newWord[i] != '\0'; i++){
-        if(passed[newWord[i] - 'a'] == 0)
-            countLetters[newWord[i] - 'a'].count++;
+        int index = getIndex(newWord[i]);
 
-        passed[newWord[i] - 'a'] = 1;
+        if(passed[index] == 0)
+            countLetters[index]++;
 
-        if(current->next[newWord[i] - 'a'] == nullptr)
-            current->next[newWord[i] - 'a'] = initNode(newWord[i], 0);
+        passed[index] = 1;
 
-        current = current->next[newWord[i] - 'a'];
+        if(current->next[index] == nullptr)
+            current->next[index] = initNode(newWord[i], 0);
+
+        current = current->next[index];
     }
 
     current->wordEnding = 1;
-    countLetters[26].count++;
+    countLetters[29]++;
 
     return root;
 }
 
-int calcPoints(struct letters* countLetters, char letter){
-    if(letter < 'a' || letter > 'z')
-        return -1;
+int calcPoints(int* countLetters, char letter){
+    int index = getIndex(letter);
+    return countLetters[29] - countLetters[index];
+}
 
-    return countLetters[26].count - countLetters[letter - 'a'].count;
+void writeDict(int* countLetters){
+    ofstream output("countLetters.bin", ios::binary);
+    output.write((char*)&countLetters, sizeof(countLetters));
+    output.close();
+}
+
+int* readDict(){
+    int* output = initDic();
+
+    ifstream input("countLetters.bin", ios::binary);
+    input.read((char*)&output, sizeof(output));
+    input.close();
+
+    return output;
 }
 
 int main(){
-    struct trie* root = initNode('\0', 0);
-    struct letters* countLetters = initDic();
+    struct trie* root = initNode('#', 0);
+    int* countLetters = initDic();
 
     root = addWord(root, countLetters, "tea");
     root = addWord(root, countLetters, "ten");
@@ -80,6 +111,17 @@ int main(){
 
     char letter = 't';
     int points = calcPoints(countLetters, letter);
+
+    if(points == -1)
+        cout << "Invalid character!" << endl;
+    else
+        cout << "Points of letter " << letter << ": " << points << endl;
+
+    writeDict(countLetters);
+
+    int* countLettersInput = readDict();
+
+    points = calcPoints(countLettersInput, letter);
 
     if(points == -1)
         cout << "Invalid character!" << endl;
