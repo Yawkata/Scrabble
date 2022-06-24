@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../headers/trie.h"
-#include "../headers/trie.cpp"
+#include "../headers/header-v.0.3/trie.h"
+#include "../headers/header-v.0.3/trie.cpp"
 
 using namespace std;
 
