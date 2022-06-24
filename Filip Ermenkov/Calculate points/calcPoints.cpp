@@ -82,19 +82,33 @@ int calcPoints(int* countLetters, char letter){
 }
 
 void writeDict(int* countLetters){
-    ofstream output("countLetters.bin", ios::binary);
-    output.write((char*)&countLetters, sizeof(countLetters));
-    output.close();
+    ///ofstream output("countLetters.bin", ios::binary);
+    ///output << countLetters;
+    ///output.close();
+
+    FILE* f = fopen("countLetters.bin", "wb");
+
+    if(!f)
+        cout << "Error opening file to write!";
+
+    fwrite(countLetters, sizeof(int), 30, f);
+
+    fclose(f);
 }
 
-int* readDict(){
-    int* output = initDic();
+void readDict(int* output){
+    ///ifstream input("countLetters.bin", ios::binary);
+    ///input.read((char*)&output, sizeof(output));
+    ///input.close();
 
-    ifstream input("countLetters.bin", ios::binary);
-    input.read((char*)&output, sizeof(output));
-    input.close();
+    FILE* f = fopen("countLetters.bin", "rb");
 
-    return output;
+    if(!f)
+        cout << "Error opening file to read!";
+
+    fread(output, sizeof(int), 30, f);
+
+    fclose(f);
 }
 
 int main(){
@@ -117,9 +131,10 @@ int main(){
     else
         cout << "Points of letter " << letter << ": " << points << endl;
 
-    writeDict(countLetters);
+    //writeDict(countLetters);
 
-    int* countLettersInput = readDict();
+    int* countLettersInput = new int[30];
+    readDict(countLettersInput);
 
     points = calcPoints(countLettersInput, letter);
 
