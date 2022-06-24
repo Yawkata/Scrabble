@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#define NUM_VALID_SYMBOLS 28 // букви + ' ' + '-'
+#define NUM_VALID_SYMBOLS 29 // букви + ' ' + '-' + '''
 #define HTL_VALUE 'a'-'A'  // HTL - higher to lower
 
 using namespace std;
@@ -9,7 +9,7 @@ using namespace std;
 struct trieNode {
     char symbol;
     bool terminal;
-    struct trieNode* children[NUM_VALID_SYMBOLS];  // [abcdefghijklmnopqrstuvwxyz -]
+    struct trieNode* children[NUM_VALID_SYMBOLS];  // [abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -']
 };
 
 struct trieNode* initNode(char symbol, bool terminal) {
@@ -17,7 +17,9 @@ struct trieNode* initNode(char symbol, bool terminal) {
 
     node->symbol = symbol;
     node->terminal = terminal;
-    for(int i = 0; i < NUM_VALID_SYMBOLS; i++) node->children[i] = nullptr;
+
+    for(int i = 0; i < NUM_VALID_SYMBOLS; i++)
+        node->children[i] = nullptr;
 
     return node;
 }
@@ -25,8 +27,9 @@ struct trieNode* initNode(char symbol, bool terminal) {
 int symbolToIndex(char symbol) {
     if (symbol >= 'a' && symbol <= 'z') return symbol - 'a';
     else if (symbol >= 'A' && symbol <= 'Z') return symbol - 'A';
-    else if (symbol == ' ') return NUM_VALID_SYMBOLS-2;
-    else if (symbol == '-') return NUM_VALID_SYMBOLS-1;
+    else if (symbol == ' ') return NUM_VALID_SYMBOLS - 3;
+    else if (symbol == '-') return NUM_VALID_SYMBOLS - 2;
+    else if (symbol == 39) return NUM_VALID_SYMBOLS - 1;  // 39 => ' code
     return -1;
 }
 
@@ -80,9 +83,8 @@ struct trieNode* getTrieFromDict(string filename) {
     ifstream dictionary(filename);
 
     string line;
-    while(getline(dictionary, line)) {
+    while(getline(dictionary, line))
         trieInsert(root, line);
-    }
 
     return root;
 }
