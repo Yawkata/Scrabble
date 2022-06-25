@@ -1,13 +1,13 @@
 #ifndef CP_H
 #define CP_H
 
-#define CL_FILE "countLetters.bin"  // countLetters file
+#define CS_FILE "countSymbols.bin"  // countSymbols file
 
 int* initDict();
 
-int calcPoints(int* countLetters, char letter);
+int calcPoints(int* countSymbols, char symbol);
 
-void writeDict(int* countLetters);
-int* readDict();
+void writeDict(int* countSymbols);
+void readDict();
 
 #endif

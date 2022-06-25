@@ -20,18 +20,28 @@ int calcPoints(int* countSymbols, char symbol) {
     return countSymbols[NUM_VALID_SYMBOLS] - countSymbols[index];
 }
 
-void writeDict(int* countLetters) {
-    std::ofstream output(CL_FILE, std::ios::binary);
-    output.write((char*)&countLetters, sizeof(countLetters));
-    output.close();
+void writeDict(int* countSymbols) {
+    FILE* f = fopen(CS_FILE, "wb");
+
+    if(!f) {
+        std::cout << "Error opening file to write!" << std::endl;
+        return;
+    }
+
+    fwrite(countSymbols, sizeof(int), NUM_VALID_SYMBOLS+1, f);
+
+    fclose(f);
 }
 
-int* readDict() {
-    int* output = initDict();
+void readDict(int* output) {
+    FILE* f = fopen(CS_FILE, "rb");
 
-    std::ifstream input(CL_FILE, std::ios::binary);
-    input.read((char*)&output, sizeof(output));
-    input.close();
+    if(!f) {
+        std::cout << "Error opening file to read!" << std::endl;
+        return;
+    }
 
-    return output;
+    fread(output, sizeof(int), NUM_VALID_SYMBOLS+1, f);
+
+    fclose(f);
 }
