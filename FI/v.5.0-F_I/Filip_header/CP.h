@@ -8,6 +8,6 @@ int* initDict();
 int calcPoints(int* countSymbols, char symbol);
 
 void writeDict(int* countSymbols);
-void readDict();
+void readDict(int* output);
 
 #endif
