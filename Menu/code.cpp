@@ -100,8 +100,11 @@ void guessLoop(struct trieNode* root, int* dict) {
 }
 
 void showLeaderboard(){
-    vector<player> players = readPlayersFromFile("leaderboard.bin");
+    system("cls");
+    vector<player> players = readPlayersFromFile("highscores.bin");
     printScoreBoard(players);
+
+	getch();
 }
 
 void gameLoop() {
@@ -112,29 +115,26 @@ void gameLoop() {
     struct trieNode* root = getTrieFromDict("dictionary.txt", dict);
 
     while(true) {
+        system("cls");
         printMenu();
 
         jump:
             char answer;
             answer = getch();
-
+        system("cls");
         if (answer == '1') {  // New Game
-            system("cls");
             startGame(numRounds, numSymbols);
         }else if(answer == '2') {  // Settings
-            system("cls");
             if(settingsLoop(&numRounds, &numSymbols)) break;
         }else if(answer == '3') {  // Enter new guess
-            system("cls");
             guessLoop(root, dict);
-            system("cls");
-        }else if(answer == '4') {  // Exit
-            system("cls");
-            break;
-        }else if(answer == '5'){
-            system("cls");
+        }else if(answer == '4') {
             showLeaderboard();
+        }else if(answer == '5'){ // Exit
+            break;
         }else goto jump;
+
+
 
     }
 }

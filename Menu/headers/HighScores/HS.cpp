@@ -12,7 +12,7 @@ struct player {
 void printScoreBoard(std::vector <player> players) {
     std::cout << "\n\t\tScore Board:" << std::endl << std::endl;
 
-    if (players.empty())
+    if (players.size() == 0)
         return;
 
     for (int i = 0; i < players.size(); i++) {

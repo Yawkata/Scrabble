@@ -13,8 +13,7 @@ void printScoreBoard(std::vector <player> players) {
     std::cout << "\n\t\tScore Board:" << std::endl << std::endl;
 
     if (players.size() == 0) {
-	std::cout << "There aren't any records!" << std::endl;
-	return;
+        return;
     }
 
     for (int i = 0; i < players.size(); i++) {
@@ -69,10 +68,14 @@ void savePlayersToFile(std::string filename, std::vector <player>& players) {
 }
 
 std::vector <player> readPlayersFromFile(std::string filename) {
+    std::cout << "AAAAAA";
     struct player newPlayer;
     std::vector <player> players;
 
     std::ifstream input_file(filename, std::ios::binary);
+    if(!input_file){
+        return players;
+    }
 
     int numOfPlayers;
     input_file.read(reinterpret_cast<char *>(&numOfPlayers), sizeof(numOfPlayers));
@@ -83,6 +86,6 @@ std::vector <player> readPlayersFromFile(std::string filename) {
         numOfPlayers--;
 
     }
-    
+
     return players;
 }
