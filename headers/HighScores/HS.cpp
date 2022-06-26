@@ -12,6 +12,11 @@ struct player {
 void printScoreBoard(std::vector <player> players) {
     std::cout << "\n\t\tScore Board:" << std::endl << std::endl;
 
+    if (players.size() == 0) {
+	std::cout << "There aren't any records!" << std::endl;
+	return;
+    }
+
     for (int i = 0; i < players.size(); i++) {
         std::cout << "\t\tNAME: " << players.at(i).name << std::endl;
         std::cout << "\t\tHIGHSCORE: " << players.at(i).highscore << std::endl;
@@ -25,6 +30,7 @@ int checkIfPlayerAlreadyExists(char name[50], std::vector <player>& players) {
             return 0;
         }
     }
+
     return 1;
 }
 
