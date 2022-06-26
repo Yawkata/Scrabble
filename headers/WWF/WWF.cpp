@@ -2,6 +2,7 @@
 #include <fstream>
 #include "WWF.h"
 #include "../Trie/trie.h"
+#include "../CP/CP.h"
 
 void updateLoadFile(std::string filename) {
     std::fstream loadFile;
@@ -96,14 +97,16 @@ int chooseFile(std::string dictFileName, std::string cacheFileName, std::string 
 
 void loadTrie() {
     struct trieNode* trie;
+    int* dict = initDict();
 
     if (chooseFile(DICTIONARY_FILE, CACHE_FILE, LOAD_FILE)) {
         trie = getTrieFromCacheFile();
     } else {
-        trie = getTrieFromDict(DICTIONARY_FILE);
+        trie = getTrieFromDict(DICTIONARY_FILE, dict);
         updateCacheFile(trie);
     }
 
+    delete[] dict;
     printTrie(trie);
 }
 
@@ -112,7 +115,7 @@ void addWordToDictionary(std::string word) {
     dictFile.open(DICTIONARY_FILE, std::ios::app);
 
     if(dictFile.is_open()){
-        dictFile << word << std::endl;
+        dictFile << std::endl <<word;
         dictFile.close();
     }else{
         std::cout << "Error" << std::endl;
