@@ -23,9 +23,9 @@ void printMenu() {
 }
 
 void printSettings() {
-    printPart("./resources/Settings/title.txt");
+    printPart("./resources/Menu/title.txt");
     printPart("./resources/Settings/options.txt");
-    printPart("./resources/Settings/bottom.txt");
+    printPart("./resources/Menu/creators.txt");
 }
 
 bool startGame() {
