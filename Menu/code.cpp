@@ -42,10 +42,7 @@ void printSettings() {
 }
 
 void startGame(int numRounds, int numSymbols) {
-    while(true){
-
-
-    }
+    //for(int i = 0; i < numRounds; i++)
 }
 
 bool settingsLoop(int* numRounds, int* numSymbols) {
