@@ -16,6 +16,8 @@
 #include "./headers/HighScores/HS.cpp"
 #include "./headers/HighScores/HS.h"
 
+#define HIGHSCORES "highscores.bin"
+
 using namespace std;
 
 void printPart(string filename) {
@@ -41,9 +43,29 @@ void printSettings() {
     printPart("./resources/Menu/creators.txt");
 }
 
+void saveScore(int highscore){
+    char name[50];
+    vector <player> players = readPlayersFromFile(HIGHSCORES);
+    cout << "Do you want to save your score? (y/n): ";
+    char answer;
+    answer = getch();
+    if (answer == 'y') {
+        cout << "\nEnter your name: ";
+        cin >> name;
+        insertNewPlayer(name, highscore, players);
+        savePlayersToFile(HIGHSCORES, players);
+    }else{
+        return;
+    }
+}
+
 void startGame(int numRounds, int numSymbols) {
     //for(int i = 0; i < numRounds; i++)
+
+
 }
+
+
 
 bool settingsLoop(int* numRounds, int* numSymbols) {
     while(true) {
@@ -101,7 +123,7 @@ void guessLoop(struct trieNode* root, int* dict) {
 
 void showLeaderboard(){
     system("cls");
-    vector<player> players = readPlayersFromFile("highscores.bin");
+    vector<player> players = readPlayersFromFile(HIGHSCORES);
     printScoreBoard(players);
 
 	getch();
@@ -112,7 +134,7 @@ void gameLoop() {
     int numSymbols = 10;
 
     int* dict = initDict();
-    struct trieNode* root = getTrieFromDict("dictionary.txt", dict);
+    struct trieNode* root = getTrieFromDict(DICTIONARY_FILE, dict);
 
     while(true) {
         system("cls");

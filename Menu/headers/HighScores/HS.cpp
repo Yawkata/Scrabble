@@ -18,6 +18,7 @@ void printScoreBoard(std::vector <player> players) {
     for (int i = 0; i < players.size(); i++) {
         std::cout << "\t\tNAME: " << players.at(i).name << std::endl;
         std::cout << "\t\tHIGHSCORE: " << players.at(i).highscore << std::endl;
+        std::cout << std::endl;
     }
 }
 
