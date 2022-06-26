@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
-#include <vector>
+#include <time.h>
 
 #include "./headers/Trie/trie.cpp"
 #include "./headers/Trie/trie.h"
@@ -41,8 +41,75 @@ void printSettings() {
     printPart("./resources/Menu/creators.txt");
 }
 
-void startGame(int numRounds, int numSymbols) {
-    //for(int i = 0; i < numRounds; i++)
+vector<char> generateSymbols(struct trieNode* root, int numSymbols){
+    vector<char> symbols;
+
+    srand(time(0));
+
+    struct trieNode* current = root;
+    int count = 0;
+
+    for(int i = 0; i < numSymbols; i++){
+        int index = rand() % NUM_VALID_SYMBOLS;
+        if(current->children[index] != nullptr){
+            symbols.push_back(current->children[index]->symbol);
+            current = current->children[index];
+        }else{
+            i--;
+            count++;
+            if(count > 30){
+                int newIndex = rand() % NUM_VALID_SYMBOLS;
+                current = root->children[newIndex];
+
+                while(current == nullptr){
+                    newIndex = rand() % NUM_VALID_SYMBOLS;
+                    current = root->children[newIndex];
+                }
+
+                count = 0;
+            }
+        }
+    }
+
+    return symbols;
+}
+
+void printGuessedWords(vector<string> guessedWords){
+    cout << endl << endl << "\t\t\tGuessed words: " << endl;
+    for(int i = 0; i < guessedWords.size(); i++)
+        cout << "\t\t\t" << i + 1 << ". " << guessedWords.at(i) << endl;
+}
+
+void printAvailableSymbols(vector<char> symbols){
+    cout << endl << endl << "\t\t\tAvailable Symbols: " << endl << "\t\t\t";
+
+    for(unsigned int i = 0; i < symbols.size(); i++)
+        cout << symbols.at(i) << " ";
+
+}
+
+void startGame(int numRounds, int numSymbols, struct trieNode* root, int* dict) {
+    for(int i = 0; i < numRounds; i++){
+        cout << "ROUND 1" << endl << endl;
+
+        vector<char> symbols = generateSymbols(root, numSymbols);
+        vector<string> guessedWords;
+
+        while(true){
+            printPart("./resources/Menu/title.txt");
+            printGuessedWords(guessedWords);
+            printAvailableSymbols(symbols);
+
+            cout << endl << endl << "\t\t\t\t\t\t\tEnter word:" << endl << "\t\t\t\t\t\t\t";
+            string newWord;
+            getline(cin, newWord);
+
+            if(trieSearch(root, newWord))
+                guessedWords.push_back(newWord);
+
+        }
+    }
+
 }
 
 bool settingsLoop(int* numRounds, int* numSymbols) {
@@ -120,7 +187,7 @@ void gameLoop() {
 
         if (answer == '1') {  // New Game
             system("cls");
-            startGame(numRounds, numSymbols);
+            startGame(numRounds, numSymbols, root, dict);
         }else if(answer == '2') {  // Settings
             system("cls");
             if(settingsLoop(&numRounds, &numSymbols)) break;
