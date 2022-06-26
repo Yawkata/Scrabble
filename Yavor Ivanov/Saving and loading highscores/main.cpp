@@ -92,19 +92,18 @@ vector <player> readPlayersFromFile(string fileName){
 int main()
 {
     vector<player>Players;
-    /*
+
     insertNewPlayer("gosho", 123, Players);
     insertNewPlayer("Tosho", 23, Players);
     insertNewPlayer("Pesho", 234, Players);
     insertNewPlayer("Concho", 150, Players);
     insertNewPlayer("Concho", 30, Players);
 
-
     savePlayersToFile("highscores.bin", Players);
-    */
+
     vector<player> Highscores = readPlayersFromFile("highscores.bin");
 
-    printScoreBoard(Players);
+    printScoreBoard(Highscores);
 
     return 0;
 }
