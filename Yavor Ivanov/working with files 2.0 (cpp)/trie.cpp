@@ -1,79 +1,62 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector> /*<+>*/
-#define NUM_LETTERS 26
+#define NUM_VALID_SYMBOLS 29 //
+#define HTL_VALUE 'a'-'A'  //
+#define SYMBOL '@'
 
 using namespace std;
 
 
-struct letter {
-    unsigned int count;
-};
-
-struct letter* initDict() {
-    struct letter* newCountLetters = new letter[27];
-
-    for(int i = 0; i < NUM_LETTERS+1; i++)
-        newCountLetters[i].count = 0;
-
-    return newCountLetters;
-};
-
-int letterToIndex(char letter) {
-    return letter - 'a';
-}
-
-int calcPoints(struct letter* countLetters, char letter) {
-    unsigned int letterIndex = letterToIndex(letter);
-    if (letterIndex < 0 || letterIndex > NUM_LETTERS-1) return -1;
-
-    return countLetters[NUM_LETTERS].count - countLetters[letterIndex].count;
-}
-
 struct trieNode {
-    char letter;
+    char symbol;
     bool terminal;
-    struct trieNode* children[NUM_LETTERS];
+    struct trieNode* children[NUM_VALID_SYMBOLS];  // [abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -']
 };
 
-struct trieNode* initNode(char letter, bool terminal) {
+struct trieNode* initNode(char symbol, bool terminal) {
     struct trieNode* node = new trieNode;
 
-    node->letter = letter;
+    node->symbol = symbol;
     node->terminal = terminal;
-    for(int i = 0; i < NUM_LETTERS; i++) node->children[i] = nullptr;
+
+    for(int i = 0; i < NUM_VALID_SYMBOLS; i++)
+        node->children[i] = nullptr;
 
     return node;
 }
 
-bool trieInsert(struct trieNode* root, string word, struct letter* dict) {
+int symbolToIndex(char symbol) {
+    if (symbol >= 'a' && symbol <= 'z') return symbol - 'a';
+    else if (symbol >= 'A' && symbol <= 'Z') return symbol - 'A';
+    else if (symbol == ' ') return NUM_VALID_SYMBOLS - 3;
+    else if (symbol == '-') return NUM_VALID_SYMBOLS - 2;
+    else if (symbol == 39) return NUM_VALID_SYMBOLS - 1;  // 39 => ' code
+    return -1;
+}
+
+char toLower(char symbol) {
+    if (symbol >= 'A' && symbol <= 'Z') return symbol + HTL_VALUE;
+    return symbol;
+}
+
+bool trieInsert(struct trieNode* root, string word) {
     if (!root || word.empty()) return false;
 
     struct trieNode* cur = root;
     bool smthAdded = false;
 
-    bool passedLetters[NUM_LETTERS];
-    for(int i = 0; i < NUM_LETTERS; i++) passedLetters[i] = false;
-
     for(int i = 0; i < word.size(); i++) {
-        int letterIndex = letterToIndex(word[i]);
-        if (letterIndex < 0 || letterIndex > NUM_LETTERS-1) return false;
+        int symbolIndex = symbolToIndex(word[i]);
+        if (symbolIndex == -1) return false;
 
-        if (!passedLetters[letterIndex]) {
-            dict[letterIndex].count++;
-            passedLetters[letterIndex] = true;
-        }
-
-        if (cur->children[letterIndex] == NULL) {
-            cur->children[letterIndex] = initNode(word[i], (i == word.size()-1));
+        if (cur->children[symbolIndex] == NULL) {
+            cur->children[symbolIndex] = initNode(toLower(word[i]), (i == word.size()-1));
             smthAdded = true;
         }
 
-        cur = cur->children[letterIndex];
+        cur = cur->children[symbolIndex];
     }
 
-    dict[NUM_LETTERS].count++;  // на последния индекс се пази броят на всички думи в дървото
     return smthAdded;
 }
 
@@ -83,41 +66,40 @@ bool trieSearch(struct trieNode* root, string word) {
     struct trieNode* cur = root;
 
     for(int i = 0; i < word.size(); i++) {
-        unsigned int letterIndex = letterToIndex(word[i]);
-        if (letterIndex < 0 || letterIndex > NUM_LETTERS-1) return false;
+        int symbolIndex = symbolToIndex(word[i]);
+        if (symbolIndex == -1) return false;
 
-        if (cur->children[letterIndex] != nullptr) {
-            cur = cur->children[letterIndex];
+        if (cur->children[symbolIndex] != nullptr) {
+            cur = cur->children[symbolIndex];
         } else return false;
     }
 
     return (cur->terminal == true);
 }
 
-struct trieNode* getTrieFromDict(string filename, struct letter* dict) {
+struct trieNode* getTrieFromDict(string filename) {
     if (filename.empty()) return nullptr;
     struct trieNode* root = initNode('#', false);
 
     ifstream dictionary(filename);
 
     string line;
-    string token;
-    while(getline(dictionary, line)) {
-        stringstream ss(line);
-        while(ss >> token) trieInsert(root, token, dict);
-    }
+    while(getline(dictionary, line))
+        trieInsert(root, line);
 
     return root;
 }
 
 void printTrieRec(struct trieNode* node, string cur, int* count) {
     if (node->terminal) {
-        cout << "Word: " << cur << endl;
+        cout << "\nGuess: " << cur << endl;
         (*count)++;
     }
 
     for (struct trieNode* child : node->children) {
-        if (child != NULL) printTrieRec(child, cur+child->letter, count);
+        if (child != NULL) {
+            printTrieRec(child, cur+child->symbol, count);
+        }
     }
 }
 
@@ -128,20 +110,19 @@ void printTrie(struct trieNode* root) {
     }
 
     int* count = new int;
-    *count = 0;
+    *(count) = 0;
 
     for (struct trieNode* node : root->children) {
         if (node != NULL) {
             string cur = "";
-            cur.push_back(node->letter);
+            cur.push_back(node->symbol);
             printTrieRec(node, cur, count);
         }
     }
 
-    cout << "Number of words: " << *count << endl;
+    cout << "Number of guesses: " << *count << endl;
     delete count;
 }
-
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 #define DICTIONARY_FILE "dictionary.txt"
@@ -160,28 +141,53 @@ void updateLoadFile(string fileName){
     }
 }
 
-void updateCacheFile(struct trieNode* root){
-    fstream binFile;
-    binFile.open(CACHE_FILE, ios::out);
-
-    if(binFile.is_open()){
-        binFile.write((char*)root, sizeof(struct trieNode));
-        binFile.close();
-    }else{
-        cout << "Error" << endl;
+void deconstructTrieToFile(struct trieNode* root, FILE *fp){
+    if(!root){
+        return;
     }
+    fwrite(root, sizeof(struct trieNode), 1, fp);
+    for(int i = 0; i < NUM_VALID_SYMBOLS; i++)
+        if(root->children[i]){
+            deconstructTrieToFile(root->children[i],  fp);
+        }
+
+    struct trieNode* marker = initNode(SYMBOL, false);
+    fwrite(marker, sizeof(struct trieNode), 1, fp);
+}
+
+void updateCacheFile(struct trieNode* root){
+    FILE *fp = fopen(CACHE_FILE, "wb");
+    if (fp == NULL)
+    {
+        cout << "Error while opening: " << CACHE_FILE << endl;
+        return;
+    }
+    deconstructTrieToFile(root, fp);
+    fclose(fp);
+}
+
+int constructTrieFromFile(struct trieNode*&root, FILE *fp){
+    struct trieNode node;
+    if(!fread(&node, sizeof(struct trieNode), 1, fp) || node.symbol == SYMBOL)
+       return 1;
+
+    root = initNode(node.symbol, node.terminal);
+    for(int i = 0; i < NUM_VALID_SYMBOLS; i++){
+      if(constructTrieFromFile(root->children[i], fp))
+         break;
+    }
+
+    return 0;
 }
 
 struct trieNode* getTrieFromCacheFile(){
-    struct trieNode* root = initNode('#', false);
+    struct trieNode* root;
 
-    fstream binFile;
-    binFile.open(CACHE_FILE, ios::in | ios::binary);
+    FILE *binFile = fopen(CACHE_FILE, "rb");
+    constructTrieFromFile(root, binFile);
+    fclose(binFile);
 
-    if(binFile.is_open()){
-        binFile.read((char*)root, sizeof(struct trieNode));
-        binFile.close();
-    }
+
 
     return root;
 }
@@ -213,6 +219,19 @@ int chooseFile(string dictFileName, string cacheFileName, string loadFileName){
     return 0;
 }
 
+void loadTrie(){
+    struct trieNode* trie;
+
+    if(chooseFile(DICTIONARY_FILE, CACHE_FILE, LOAD_FILE)){
+        trie = getTrieFromCacheFile();
+    }else{
+        trie = getTrieFromDict(DICTIONARY_FILE);
+        updateCacheFile(trie);
+    }
+    printTrie(trie);
+
+}
+
 void addWordToDictionary(string word){
     fstream dictFile;
     dictFile.open(DICTIONARY_FILE, ios::app);
@@ -227,21 +246,12 @@ void addWordToDictionary(string word){
     updateLoadFile(DICTIONARY_FILE);
 }
 
-void loadTrie(){
-    struct trieNode* trie = initNode('#', false);
-    struct letter* dict = initDict();
-
-    if(chooseFile(DICTIONARY_FILE, CACHE_FILE, LOAD_FILE)){
-        trie = getTrieFromCacheFile();
-    }else{
-        trie = getTrieFromDict(DICTIONARY_FILE, dict);
-        updateCacheFile(trie);
-    }
-}
-
 
 
 int main() {
-    addWordToDictionary("novaduma");
+    //addWordToDictionary("banan");
     loadTrie();
+
+
+
 }
