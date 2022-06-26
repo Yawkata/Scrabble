@@ -4,16 +4,9 @@
 #include <fstream>
 #include <time.h>
 
-#include "./headers/Trie/trie.cpp"
 #include "./headers/Trie/trie.h"
-
-#include "./headers/CP/CP.cpp"
 #include "./headers/CP/CP.h"
-
-#include "./headers/WWF/WWF.cpp"
 #include "./headers/WWF/WWF.h"
-
-#include "./headers/HighScores/HS.cpp"
 #include "./headers/HighScores/HS.h"
 
 using namespace std;
