@@ -2,6 +2,19 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
+#include <vector>
+
+#include "./headers/Trie/trie.cpp"
+#include "./headers/Trie/trie.h"
+
+#include "./headers/CP/CP.cpp"
+#include "./headers/CP/CP.h"
+
+#include "./headers/WWF/WWF.cpp"
+#include "./headers/WWF/WWF.h"
+
+#include "./headers/HighScores/HS.cpp"
+#include "./headers/HighScores/HS.h"
 
 using namespace std;
 
@@ -23,16 +36,19 @@ void printMenu() {
 }
 
 void printSettings() {
-    printPart("./resources/Settings/title.txt");
+    printPart("./resources/Menu/title.txt");
     printPart("./resources/Settings/options.txt");
-    printPart("./resources/Settings/bottom.txt");
+    printPart("./resources/Menu/creators.txt");
 }
 
-bool startGame() {
-    return false;
+void startGame(int numRounds, int numSymbols) {
+    while(true){
+
+
+    }
 }
 
-int settingsLoop() {
+bool settingsLoop(int* numRounds, int* numSymbols) {
     while(true) {
         printSettings();
 
@@ -42,7 +58,25 @@ int settingsLoop() {
 
         if (answer == '1') {  // Given symbols
             system("cls");
+            cout << "> Enter new quantity of given symbols: ";
+            cin >> *numSymbols;
+
+            if(*numSymbols <= 0){
+                cout << endl << "> Invalid quantity!" << endl;
+                Sleep(1000);
+            }
+
+            system("cls");
         }else if(answer == '2') {  // Rounds
+            system("cls");
+            cout << "> Enter new quantity of rounds: ";
+            cin >> *numRounds;
+
+            if(*numRounds <= 0){
+                cout << endl << "> Invalid quantity!" << endl;
+                Sleep(1000);
+            }
+
             system("cls");
         }else if(answer == '3') {  // Back
             system("cls");
@@ -54,17 +88,32 @@ int settingsLoop() {
     }
 }
 
-bool wordLoop() {
-    while(true) {
-        string newGuess;
-        cout << "Please enter a new word" << endl;
-        cin >> newGuess;
-        // check if the word is already in the dict
-        return false;
+void guessLoop(struct trieNode* root, int* dict) {
+    string newGuess;
+    cout << "> Please enter a new guess: ";
+    getline(cin, newGuess);
+
+    if(!trieSearch(root, newGuess)){
+        trieInsert(root, dict, newGuess);
+        addWordToDictionary(newGuess);
+    }else{
+        cout << endl << "> This word already exists";
+        Sleep(1000);
     }
 }
 
+void showLeaderboard(){
+    vector<player> players = readPlayersFromFile("leaderboard.bin");
+    printScoreBoard(players);
+}
+
 void gameLoop() {
+    int numRounds = 10;
+    int numSymbols = 10;
+
+    int* dict = initDict();
+    struct trieNode* root = getTrieFromDict("dictionary.txt", dict);
+
     while(true) {
         printMenu();
 
@@ -74,18 +123,22 @@ void gameLoop() {
 
         if (answer == '1') {  // New Game
             system("cls");
-            if(startGame()) break;
+            startGame(numRounds, numSymbols);
         }else if(answer == '2') {  // Settings
             system("cls");
-            if(settingsLoop()) break;
+            if(settingsLoop(&numRounds, &numSymbols)) break;
         }else if(answer == '3') {  // Enter new guess
             system("cls");
-            if(wordLoop()) break;
+            guessLoop(root, dict);
             system("cls");
         }else if(answer == '4') {  // Exit
             system("cls");
             break;
+        }else if(answer == '5'){
+            system("cls");
+            showLeaderboard();
         }else goto jump;
+
     }
 }
 
