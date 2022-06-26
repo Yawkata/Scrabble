@@ -13,6 +13,9 @@ struct player{
 
 void printScoreBoard(vector <player> Players){
     cout << "\n\t\tScore Board:" << endl << endl;
+    if(Players.empty()){
+        return;
+    }
     for(int i = 0; i < Players.size(); i++){
         cout << "\t\tNAME: " << Players.at(i).name << endl;
         cout << "\t\tHIGHSCORE: " << Players.at(i).highscore << endl;
@@ -70,6 +73,9 @@ vector <player> readPlayersFromFile(string fileName){
     vector <player> Players;
 
     ifstream input_file(fileName, ios::binary);
+    if(!input_file){
+        return Players;
+    }
 
     int numOfPlayers;
     input_file.read(reinterpret_cast<char *>(&numOfPlayers), sizeof(numOfPlayers));
@@ -86,7 +92,7 @@ vector <player> readPlayersFromFile(string fileName){
 int main()
 {
     vector<player>Players;
-
+    /*
     insertNewPlayer("gosho", 123, Players);
     insertNewPlayer("Tosho", 23, Players);
     insertNewPlayer("Pesho", 234, Players);
@@ -95,7 +101,7 @@ int main()
 
 
     savePlayersToFile("highscores.bin", Players);
-
+    */
     vector<player> Highscores = readPlayersFromFile("highscores.bin");
 
     printScoreBoard(Players);
