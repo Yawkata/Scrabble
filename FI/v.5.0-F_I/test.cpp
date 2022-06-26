@@ -5,6 +5,7 @@
 using namespace std;
 
 int main() {
+    /**/
     int* countSymbols = initDict();
     struct trieNode* root = getTrieFromDict("dict.txt", countSymbols);
     printTrie(root);
@@ -24,8 +25,8 @@ int main() {
 
     cout <<(trieSearch(root, "IVAN's home") ? "Found!" : "Not Found!") << endl;
 
-    // writeDict(countSymbols);
-
+    writeDict(countSymbols);
+    cout << "Done!" << endl;
     /*
     int* countSymbolsInput = initDict();
     readDict(countSymbolsInput);

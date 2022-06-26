@@ -82,33 +82,27 @@ int calcPoints(int* countLetters, char letter){
 }
 
 void writeDict(int* countLetters){
-    ///ofstream output("countLetters.bin", ios::binary);
-    ///output << countLetters;
-    ///output.close();
+    ofstream output("countLetters.bin", ios::binary);
 
-    FILE* f = fopen("countLetters.bin", "wb");
+    int count = 30;
+    output.write((char*)&count, sizeof(count));
 
-    if(!f)
-        cout << "Error opening file to write!";
+    for(int i = 0; i < count; i++)
+        output.write((char*)&countLetters[i], sizeof(countLetters[i]));
 
-    fwrite(countLetters, sizeof(int), 30, f);
-
-    fclose(f);
+    output.close();
 }
 
 void readDict(int* output){
-    ///ifstream input("countLetters.bin", ios::binary);
-    ///input.read((char*)&output, sizeof(output));
-    ///input.close();
+    ifstream input("countLetters.bin", ios::binary);
+    int count;
+    input.read((char*)&count, sizeof(count));
 
-    FILE* f = fopen("countLetters.bin", "rb");
+    for(int i = 0; i < count; i++)
+        input.read((char*)&output[i], sizeof(output[i]));
 
-    if(!f)
-        cout << "Error opening file to read!";
 
-    fread(output, sizeof(int), 30, f);
-
-    fclose(f);
+    input.close();
 }
 
 int main(){
