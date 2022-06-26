@@ -16,6 +16,8 @@
 #include "./headers/HighScores/HS.cpp"
 #include "./headers/HighScores/HS.h"
 
+#define HIGHSCORES "highscores.bin"
+
 using namespace std;
 
 void printPart(string filename) {
@@ -41,6 +43,7 @@ void printSettings() {
     printPart("./resources/Menu/creators.txt");
 }
 
+<<<<<<< HEAD
 vector<char> generateSymbols(struct trieNode* root, int numSymbols){
     vector<char> symbols;
 
@@ -109,8 +112,31 @@ void startGame(int numRounds, int numSymbols, struct trieNode* root, int* dict) 
 
         }
     }
+=======
+void saveScore(int highscore){
+    char name[50];
+    vector <player> players = readPlayersFromFile(HIGHSCORES);
+    cout << "Do you want to save your score? (y/n): ";
+    char answer;
+    answer = getch();
+    if (answer == 'y') {
+        cout << "\nEnter your name: ";
+        cin >> name;
+        insertNewPlayer(name, highscore, players);
+        savePlayersToFile(HIGHSCORES, players);
+    }else{
+        return;
+    }
+}
+
+void startGame(int numRounds, int numSymbols) {
+    //for(int i = 0; i < numRounds; i++)
+
+>>>>>>> 719b909094d32ea2eaaca27fd129f83e90ff4ef8
 
 }
+
+
 
 bool settingsLoop(int* numRounds, int* numSymbols) {
     while(true) {
@@ -167,8 +193,11 @@ void guessLoop(struct trieNode* root, int* dict) {
 }
 
 void showLeaderboard(){
-    vector<player> players = readPlayersFromFile("leaderboard.bin");
+    system("cls");
+    vector<player> players = readPlayersFromFile(HIGHSCORES);
     printScoreBoard(players);
+
+	getch();
 }
 
 void gameLoop() {
@@ -176,32 +205,34 @@ void gameLoop() {
     int numSymbols = 10;
 
     int* dict = initDict();
-    struct trieNode* root = getTrieFromDict("dictionary.txt", dict);
+    struct trieNode* root = getTrieFromDict(DICTIONARY_FILE, dict);
 
     while(true) {
+        system("cls");
         printMenu();
 
         jump:
             char answer;
             answer = getch();
-
+        system("cls");
         if (answer == '1') {  // New Game
+<<<<<<< HEAD
             system("cls");
             startGame(numRounds, numSymbols, root, dict);
+=======
+            startGame(numRounds, numSymbols);
+>>>>>>> 719b909094d32ea2eaaca27fd129f83e90ff4ef8
         }else if(answer == '2') {  // Settings
-            system("cls");
             if(settingsLoop(&numRounds, &numSymbols)) break;
         }else if(answer == '3') {  // Enter new guess
-            system("cls");
             guessLoop(root, dict);
-            system("cls");
-        }else if(answer == '4') {  // Exit
-            system("cls");
-            break;
-        }else if(answer == '5'){
-            system("cls");
+        }else if(answer == '4') {
             showLeaderboard();
+        }else if(answer == '5'){ // Exit
+            break;
         }else goto jump;
+
+
 
     }
 }
