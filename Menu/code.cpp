@@ -43,7 +43,6 @@ void printSettings() {
     printPart("./resources/Menu/creators.txt");
 }
 
-<<<<<<< HEAD
 vector<char> generateSymbols(struct trieNode* root, int numSymbols){
     vector<char> symbols;
 
@@ -112,7 +111,7 @@ void startGame(int numRounds, int numSymbols, struct trieNode* root, int* dict) 
 
         }
     }
-=======
+}
 void saveScore(int highscore){
     char name[50];
     vector <player> players = readPlayersFromFile(HIGHSCORES);
@@ -132,7 +131,6 @@ void saveScore(int highscore){
 void startGame(int numRounds, int numSymbols) {
     //for(int i = 0; i < numRounds; i++)
 
->>>>>>> 719b909094d32ea2eaaca27fd129f83e90ff4ef8
 
 }
 
@@ -216,12 +214,9 @@ void gameLoop() {
             answer = getch();
         system("cls");
         if (answer == '1') {  // New Game
-<<<<<<< HEAD
             system("cls");
             startGame(numRounds, numSymbols, root, dict);
-=======
             startGame(numRounds, numSymbols);
->>>>>>> 719b909094d32ea2eaaca27fd129f83e90ff4ef8
         }else if(answer == '2') {  // Settings
             if(settingsLoop(&numRounds, &numSymbols)) break;
         }else if(answer == '3') {  // Enter new guess
