@@ -2,7 +2,17 @@
 
 
 
+<<<<<<< HEAD
                                                         Creators
                               ___________________________________________________________
                  
                                   Yavor Ivanov       Ivaylo Kanyov       Filip Ermenkov
+=======
+
+
+                                                               Creators
+                 
+                                     ___________________________________________________________
+                 
+                                         Yavor Ivanov       Ivaylo Kanyov       Filip Ermenkov
+>>>>>>> 3ac69ad4acd477452397d1c88ee15fdb07e92da9

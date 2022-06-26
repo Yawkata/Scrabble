@@ -129,21 +129,29 @@ void deconstructTrieToFile(struct trieNode* root, FILE *fp){
         return;
     }
     fwrite(root, sizeof(struct trieNode), 1, fp);
+    cout << root->symbol;
     for(int i = 0; i < NUM_VALID_SYMBOLS; i++)
         if(root->children[i]){
             deconstructTrieToFile(root->children[i],  fp);
         }
 
     struct trieNode* marker = initNode(SYMBOL, false);
-    fwrite(&marker, sizeof(struct trieNode), 1, fp);
+    fwrite(marker, sizeof(struct trieNode), 1, fp);
+    cout << marker->symbol;
+
+
 }
 
 int constructTrieFromFile(struct trieNode*&root, FILE *fp){
     struct trieNode node;
-    if(!fread(&node, sizeof(struct trieNode), 1, fp) || node.symbol == SYMBOL)
+
+    if(!fread(&node, sizeof(struct trieNode), 1, fp) || (node.symbol == SYMBOL)){
        return 1;
+    }
+    //cout << node.symbol;
 
     root = initNode(node.symbol, node.terminal);
+
     for(int i = 0; i < NUM_VALID_SYMBOLS; i++){
       if(constructTrieFromFile(root->children[i], fp))
          break;
@@ -153,6 +161,7 @@ int constructTrieFromFile(struct trieNode*&root, FILE *fp){
 }
 
 int main() {
+
     struct trieNode* root = getTrieFromDict("testDict.txt");
 
     FILE *fp = fopen("trie.bin", "wb");
@@ -165,8 +174,13 @@ int main() {
 
     fclose(fp);
 
-    struct trieNode *root1 = initNode('#', false);;
+
+
+    struct trieNode *root1;
     FILE *fp2 = fopen("trie.bin", "rb");
     constructTrieFromFile(root1, fp2);
+
+
+    printTrie(root1);
 
 }
