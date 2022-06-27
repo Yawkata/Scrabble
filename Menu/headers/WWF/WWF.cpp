@@ -95,9 +95,8 @@ int chooseFile(std::string dictFileName, std::string cacheFileName, std::string 
     return 0;
 }
 
-void loadTrie() {
+struct trieNode* loadTrie(int* dict) {
     struct trieNode* trie;
-    int* dict = initDict();
 
     if (chooseFile(DICTIONARY_FILE, CACHE_FILE, LOAD_FILE)) {
         trie = getTrieFromCacheFile();
@@ -106,8 +105,7 @@ void loadTrie() {
         updateCacheFile(trie);
     }
 
-    delete[] dict;
-    printTrie(trie);
+    return trie;
 }
 
 void addWordToDictionary(std::string word) {

@@ -43,7 +43,7 @@ void printSettings() {
     printPart("./resources/Menu/creators.txt");
 }
 
-vector<char> generateSymbols(struct trieNode* root, int numSymbols){
+vector<char> generateSymbols(struct trieNode* root, int numSymbols, int* countSymbols, int* temp){
     vector<char> symbols;
 
     srand(time(0));
@@ -55,6 +55,8 @@ vector<char> generateSymbols(struct trieNode* root, int numSymbols){
         int index = rand() % NUM_VALID_SYMBOLS;
         if(current->children[index] != nullptr){
             symbols.push_back(current->children[index]->symbol);
+            countSymbols[symbolToIndex(current->children[index]->symbol)]++;
+            temp[symbolToIndex(current->children[index]->symbol)]++;
             current = current->children[index];
         }else{
             i--;
@@ -78,40 +80,47 @@ vector<char> generateSymbols(struct trieNode* root, int numSymbols){
 
 void printGuessedWords(vector<string> guessedWords){
     cout << endl << endl << "\t\t\tGuessed words: " << endl;
-    for(int i = 0; i < guessedWords.size(); i++)
+    for(unsigned int i = 0; i < guessedWords.size(); i++)
         cout << "\t\t\t" << i + 1 << ". " << guessedWords.at(i) << endl;
 }
 
-void printAvailableSymbols(vector<char> symbols){
-    cout << endl << endl << "\t\t\tAvailable Symbols: " << endl << "\t\t\t";
+void printAvailableSymbols(vector<char> symbols, int score){
+    cout << endl << endl << "\t\t\tCurrent Score: " << score << "\t     Available Symbols: " << endl << "\t\t\t\t\t\t     ";
 
     for(unsigned int i = 0; i < symbols.size(); i++)
         cout << symbols.at(i) << " ";
 
 }
 
-void startGame(int numRounds, int numSymbols, struct trieNode* root, int* dict) {
-    for(int i = 0; i < numRounds; i++){
-        cout << "ROUND 1" << endl << endl;
-
-        vector<char> symbols = generateSymbols(root, numSymbols);
-        vector<string> guessedWords;
-
-        while(true){
-            printPart("./resources/Menu/title.txt");
-            printGuessedWords(guessedWords);
-            printAvailableSymbols(symbols);
-
-            cout << endl << endl << "\t\t\t\t\t\t\tEnter word:" << endl << "\t\t\t\t\t\t\t";
-            string newWord;
-            getline(cin, newWord);
-
-            if(trieSearch(root, newWord))
-                guessedWords.push_back(newWord);
-
-        }
+int containsEnough(int* passed, int* countSymbols){
+    for(int i = 0; i < NUM_VALID_SYMBOLS; i++){
+        if(passed[i] != 0 && passed[i] > countSymbols[i])
+            return 0;
+        else if(passed[i] != 0 && passed[i] <= countSymbols[i])
+            countSymbols[i] -= passed[i];
     }
+
+    return 1;
 }
+
+int containWord(vector<string> guessedWords, string word){
+    for(unsigned int i = 0; i < guessedWords.size(); i++){
+        if(word == guessedWords.at(i))
+            return 0;
+    }
+
+    return 1;
+}
+
+string toLowerCase(string word){
+    for(int i = 0; i < word.size(); i++){
+        if(word[i] >= 'A' && word[i] <= 'Z')
+            word[i] += 32;
+    }
+
+    return word;
+}
+
 void saveScore(int highscore){
     char name[50];
     vector <player> players = readPlayersFromFile(HIGHSCORES);
@@ -128,13 +137,74 @@ void saveScore(int highscore){
     }
 }
 
-void startGame(int numRounds, int numSymbols) {
-    //for(int i = 0; i < numRounds; i++)
+void startGame(int numRounds, int numSymbols, struct trieNode* root, int* dict) {
+    int score = 0;
+    for(int i = 0; i < numRounds; i++){
+        int passed[NUM_VALID_SYMBOLS];
+        int countSymbols[NUM_VALID_SYMBOLS];
+        int temp[NUM_VALID_SYMBOLS];
+        for(int i = 0; i < NUM_VALID_SYMBOLS; i++){
+            passed[i] = 0;
+            countSymbols[i] = 0;
+            temp[i] = 0;
+        }
+
+        vector<char> symbols = generateSymbols(root, numSymbols, countSymbols, temp);
+        vector<string> guessedWords;
+
+        while(true){
+            printPart("./resources/Menu/title.txt");
+            cout << endl << endl << "\t\t\t\t\t\t\t  ROUND " << i + 1 << endl << endl;
+            printAvailableSymbols(symbols, score);
+            printGuessedWords(guessedWords);
+
+            for(int i = 0; i < NUM_VALID_SYMBOLS; i++){
+                countSymbols[i] = temp[i];
+                passed[i] = 0;
+            }
+
+            cout << endl << endl << "\t\t\t\t\t\t\tEnter word:" << endl << "\t\t\t\t\t\t\t";
+            string newWord;
+            getline(cin, newWord);
+
+            if(newWord == "next round"){
+                system("cls");
+                break;
+            }
+
+            if(newWord == "exit game"){
+                system("cls");
+                saveScore(score);
+                return;
+            }
+
+            int containAllLetters = 0;
+            for(int i = 0; i < newWord.size(); i++){
+                containAllLetters = countSymbols[symbolToIndex(newWord[i])];
+                cout << endl << symbolToIndex(newWord[i]) << endl;
+                passed[symbolToIndex(newWord[i])]++;
+                if(!containAllLetters)
+                    break;
+
+            }
 
 
+            newWord = toLowerCase(newWord);
+
+            if(trieSearch(root, newWord) && containsEnough(passed, countSymbols) && containWord(guessedWords, newWord) && symbolToIndex(newWord[i]) != -1){
+                guessedWords.push_back(newWord);
+                for(int i = 0; i < newWord.size(); i++)
+                    score += calcPoints(dict, newWord[i]);
+            }
+
+            system("cls");
+
+        }
+
+    }
+
+    saveScore(score);
 }
-
-
 
 bool settingsLoop(int* numRounds, int* numSymbols) {
     while(true) {
@@ -203,7 +273,8 @@ void gameLoop() {
     int numSymbols = 10;
 
     int* dict = initDict();
-    struct trieNode* root = getTrieFromDict(DICTIONARY_FILE, dict);
+    //struct trieNode* root = loadTrie(dict);
+    struct trieNode* root = getTrieFromDict("dictionary.txt", dict);
 
     while(true) {
         system("cls");
@@ -216,7 +287,6 @@ void gameLoop() {
         if (answer == '1') {  // New Game
             system("cls");
             startGame(numRounds, numSymbols, root, dict);
-            startGame(numRounds, numSymbols);
         }else if(answer == '2') {  // Settings
             if(settingsLoop(&numRounds, &numSymbols)) break;
         }else if(answer == '3') {  // Enter new guess
@@ -226,8 +296,6 @@ void gameLoop() {
         }else if(answer == '5'){ // Exit
             break;
         }else goto jump;
-
-
 
     }
 }

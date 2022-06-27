@@ -1,1 +1,1 @@
-dictionary.txt
+cache.bin
