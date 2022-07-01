@@ -176,7 +176,6 @@ int constructTrieFromFile(struct trieNode*&root, FILE *fp){
       if(constructTrieFromFile(root->children[i], fp))
          break;
     }
-
     return 0;
 }
 
@@ -229,7 +228,6 @@ void loadTrie(){
         updateCacheFile(trie);
     }
     printTrie(trie);
-
 }
 
 void addWordToDictionary(string word){
@@ -251,7 +249,4 @@ void addWordToDictionary(string word){
 int main() {
     //addWordToDictionary("banan");
     loadTrie();
-
-
-
 }

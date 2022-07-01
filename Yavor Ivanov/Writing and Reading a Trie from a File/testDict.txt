@@ -1,5 +1,1 @@
-dog
-artist
-buck
-bunny
-cat
+abandon
